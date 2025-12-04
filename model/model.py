@@ -5,6 +5,8 @@ from database.dao import DAO
 class Model:
     def __init__(self):
         self.G = nx.Graph()
+        self._nodes = None
+        self._edges = None
 
     def build_graph(self, year: int):
         """
@@ -15,12 +17,44 @@ class Model:
         """
         # TODO
 
+        self.G.clear()
+
+        self._edges = DAO.get_connessioni_filtrate(year)
+        all_rifugi = DAO.get_all_rifugi()
+        insieme = set()
+        self._nodes = set()
+
+        for conn in self._edges:
+            for rif in all_rifugi:
+                if rif.id == conn.id_rifugio1 or rif.id == conn.id_rifugio2:
+                    insieme.add(rif.id)
+
+        for rif in all_rifugi:
+            if rif.id in insieme:
+                self._nodes.add(rif)
+
+        self.G.add_nodes_from(self._nodes)
+
+        for conn in self._edges:
+            for rif1 in all_rifugi:
+                for rif2 in all_rifugi:
+                    if rif1.id != rif2.id:
+                        if ((rif1.id == conn.id_rifugio1 and rif2.id == conn.id_rifugio2)
+                                or (rif1.id == conn.id_rifugio2 and rif2.id == conn.id_rifugio1)):
+
+                            self.G.add_edge(rif1, rif2)
+                            conn.id_rifugi.add(rif1)
+                            conn.id_rifugi.add(rif2)
+
+
     def get_nodes(self):
         """
         Restituisce la lista dei rifugi presenti nel grafo.
         :return: lista dei rifugi presenti nel grafo.
         """
         # TODO
+
+        return self._nodes
 
     def get_num_neighbors(self, node):
         """
@@ -30,12 +64,20 @@ class Model:
         """
         # TODO
 
+        count = 0
+        for conn in self._edges:
+            if node.id == conn.id_rifugio1 or node.id == conn.id_rifugio2:
+                count += 1
+        return count
+
     def get_num_connected_components(self):
         """
         Restituisce il numero di componenti connesse del grafo.
         :return: numero di componenti connesse
         """
         # TODO
+
+        return nx.number_connected_components(self.G)
 
     def get_reachable(self, start):
         """
