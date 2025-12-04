@@ -64,11 +64,18 @@ class Model:
         """
         # TODO
 
+        # METODO ITERATIVO
+        """
         count = 0
         for conn in self._edges:
             if node.id == conn.id_rifugio1 or node.id == conn.id_rifugio2:
                 count += 1
         return count
+        """
+
+        # FUNZIONE DI NETWORKX
+        lista_vicini = list(self.G.neighbors(node))
+        return len(lista_vicini)
 
     def get_num_connected_components(self):
         """
@@ -97,3 +104,28 @@ class Model:
         """
 
         # TODO
+
+        # PRIMO METODO (dfs_tree())
+        """
+        dfs = nx.dfs_tree(self.G, source = start)
+        if dfs.has_node(start):
+            dfs.remove_node(start)
+
+        return dfs.nodes()
+        """
+
+        # SECONDO METODO
+        visitati = []
+        da_visitare = [start]
+
+        while len(da_visitare) > 0:
+            current_node = da_visitare.pop()
+
+            if current_node not in visitati:
+                visitati.append(current_node)
+
+                vicini = self.G.neighbors(current_node)
+                da_visitare.extend(vicini)
+
+        visitati.remove(start)
+        return list(visitati)

@@ -33,10 +33,10 @@ class Controller:
             ft.Text(f"Il grafo ha {num_cc} componenti connesse."))
         self._view.lista_visualizzazione.controls.append(ft.Text("Di seguito il dettaglio sui nodi:"))
 
-        for i, n in enumerate(self._model.get_nodes(), start = 1):
+        for n in self._model.get_nodes():
             # n è un oggetto rifugio; usiamo .nome come rappresentazione
             grado = self._model.get_num_neighbors(n)
-            self._view.lista_visualizzazione.controls.append(ft.Text(f"[{i}] {n} -- {grado} vicini."))
+            self._view.lista_visualizzazione.controls.append(ft.Text(f"{n} -- {grado} vicini."))
 
         # abilita dropdown e bottone raggiungibili (se erano disabilitati)
         self._view.dd_rifugio.disabled = False
